@@ -74,9 +74,9 @@ add(5, 6) # result will be in ax
 <h3>Command-line flags</h3>
 Some useful flags like:<br>
 <p>--disable-unsafe<br>
--du
+-du<br>
 will raise an error if unsafe lines are encountered (which requires me to add more functionality)</p>
 
-<p>--disable-warnings
--dw 
+<p>--disable-warnings<br>
+-dw <br>
 will disable unsafe warnings</p>
