@@ -21,7 +21,7 @@ jg if_X
 add ax, 5
 if_X:
 ```
-<br>
+
 where X is determined by the compiler.<br>
 
 <h3>Syntax</h3>
@@ -74,8 +74,9 @@ add(5, 6) # result will be in ax
 <h3>Command-line flags</h3>
 Some useful flags like:<br>
 <p>--disable-unsafe<br>
--du </p>
-will raise an error if unsafe lines are encountered (which requires me to add more functionality)<br>
-<p>--disable-warnings<br>
--dw </p>
-will disable unsafe warnings
+-du
+will raise an error if unsafe lines are encountered (which requires me to add more functionality)</p>
+
+<p>--disable-warnings
+-dw 
+will disable unsafe warnings</p>
