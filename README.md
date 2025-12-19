@@ -56,10 +56,10 @@ For if statements and loops it uses a custom Stack class that keeps track of the
 Syntax will be something similar to this:<br>
 
 ```
-fn NAME(PARAMETERS) {<br>
-  ...<br>
-}<br>
-NAME(VALUES)<br>
+fn NAME(PARAMETERS) {
+  ...
+}
+NAME(VALUES)
 
 ```
 And it will automaticly set required registers to values you specify, ex:
@@ -73,7 +73,9 @@ add(5, 6) # result will be in ax
 
 <h3>Command-line flags</h3>
 Some useful flags like:<br>
---disable-unsafe<br>
--du   will raise an error if unsafe lines are encountered (which requires me to add more functionality)<br>
---disable-warnings<br>
--dw   will disable unsafe warnings<br>
+<p>--disable-unsafe<br>
+-du </p>
+will raise an error if unsafe lines are encountered (which requires me to add more functionality)<br>
+<p>--disable-warnings<br>
+-dw </p>
+will disable unsafe warnings
