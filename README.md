@@ -4,16 +4,16 @@
 I have noticed while writing my operating system that assembly is very easy to lose track of and it is somewhat hard to write a filesystem and switch to C, so I decided to make my own mini programming language.<br>
 
 <h3>Features</h3>
-It makes abstractions that makes life easier.<br>
-For example, if statements become easier to keep track of and saves you the hussle:<br>
+<p>It makes abstractions that makes life easier.<br>
+For example, if statements become easier to keep track of and saves you the hussle:</p>
 
 ```
 if sp <= 10 {
   ax + 5
 }
 ```
-<br>
-becomes:<br>
+
+Becomes:
 
 ```
 cmp sp, 10
@@ -25,7 +25,7 @@ if_X:
 where X is determined by the compiler.<br>
 
 <h3>Syntax</h3>
-REGISTER = VALUE<br>
+<p>REGISTER = VALUE<br>
 REGISTER + VALUE<br>
 REGISTER - VALUE<br>
 / REGISTER<br>
@@ -38,10 +38,10 @@ if REGISTER COMPARATOR VALUE {<br>
 }<br>
 loop REGISTER COMPARATOR VALUE {<br>
   ...<br>
-}<br>
-You can replace any of the VALUEs with registers.<br>
-In addition to these if the compiler comes across a line that does not match any of these it assumes it is a valid NASM line and includes those in the output but marks them as unsafe.<br>
-<p></p>
+}<br></p>
+<p>You can replace any of the VALUEs with registers.<br>
+In addition to these if the compiler comes across a line that does not match any of these it assumes it is a valid NASM line and includes those in the output but marks them as unsafe.<br></p>
+
 <h3>Usage</h3>
 Intellij has a configured artifact to build the jar file using the Main.java and its requirements and then another build process has to be started to create an .exe (or standart executable for linux/mac) to build the program.<br>
 To use the program you must specify at least 1 argument which will be the name of the source file. Also there is an optional second argument which is the output file name.
@@ -54,13 +54,16 @@ For if statements and loops it uses a custom Stack class that keeps track of the
 <h2>TODO:</h2>
 <h3>Add easier functions</h3>
 Syntax will be something similar to this:<br>
+
 ```
 fn NAME(PARAMETERS) {<br>
   ...<br>
 }<br>
 NAME(VALUES)<br>
+
 ```
-And it will automaticly set required registers to values you specify, ex:<br>
+And it will automaticly set required registers to values you specify, ex:
+
 ```
 fn add(ax, bx){
   ax + bx
