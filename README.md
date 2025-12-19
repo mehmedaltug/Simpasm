@@ -6,18 +6,22 @@ I have noticed while writing my operating system that assembly is very easy to l
 <h3>Features</h3>
 It makes abstractions that makes life easier.<br>
 For example, if statements become easier to keep track of and saves you the hussle:<br>
+
 ```
 if sp <= 10 {
   ax + 5
 }
 ```
+<br>
 becomes:<br>
+
 ```
 cmp sp, 10
 jg if_X
 add ax, 5
 if_X:
 ```
+<br>
 where X is determined by the compiler.<br>
 
 <h3>Syntax</h3>
@@ -48,7 +52,7 @@ For if statements and loops it uses a custom Stack class that keeps track of the
 
 
 <h2>TODO:</h2>
-<h3>-Add easier functions</h3>
+<h3>Add easier functions</h3>
 Syntax will be something similar to this:<br>
 ```
 fn NAME(PARAMETERS) {<br>
