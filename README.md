@@ -21,7 +21,6 @@ jg if_X
 add ax, 5
 if_X:
 ```
-
 where X is determined by the compiler.<br>
 
 <h3>Syntax</h3>
@@ -60,7 +59,6 @@ fn NAME(PARAMETERS) {
   ...
 }
 NAME(VALUES)
-
 ```
 And it will automaticly set required registers to values you specify, ex:
 
