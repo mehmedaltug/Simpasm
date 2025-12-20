@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -12,25 +13,24 @@ public class Main {
     static int line_count = 0;
 
     public static String negative_comparator(String comparator){
-        switch (comparator){
-            case "<=":
-                return "g";
-            case ">=":
-                return "l";
-            case "<":
-                return "ge";
-            case ">":
-                return "le";
-            case "==":
-                return "ne";
-            case "!=":
-                return "e";
-        }
-        return null;
+        return switch (comparator) {
+            case "<=" -> "g";
+            case ">=" -> "l";
+            case "<" -> "ge";
+            case ">" -> "le";
+            case "==" -> "ne";
+            case "!=" -> "e";
+            default -> null;
+        };
+    }
+
+    public static String[] strip_whitespace(String[] str){
+        return Arrays.stream(str).filter(x -> !x.isEmpty()).toArray(String[]::new);
     }
 
     public static String determine_line(String line){
-        String[] split_line = line.trim().split(" ");
+        String[] split_line = line.trim().split("[ (),]");
+        split_line = strip_whitespace(split_line);
         String new_line;
         if(line.trim().isEmpty()) return "\n";
         if(split_line[0].equals("#"))
