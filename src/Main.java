@@ -87,22 +87,22 @@ public class Main {
         else if(line.contains("}"))
             add_statement_end = true;
         else new_line = switch (split_line[0]) {
-            case "if" -> handle_new_if(split_line, line);
-            case "loop" -> handle_new_loop(split_line, line);
-            case "/" -> String.format("div %s", split_line[1]);
-            case "*" -> String.format("mul %s", split_line[1]);
-            case "statement" -> String.format("%s:", split_line[1]);
-            case "goto" -> "jmp " + split_line[1];
-            default -> switch(split_line[1]){
-                case "=" -> String.format("mov %s, %s", split_line[0], split_line[2]);
-                case "+" -> String.format("add %s, %s", split_line[0], split_line[2]);
-                case "-" -> String.format("sub %s, %s", split_line[0], split_line[2]);
-                default -> handle_unsafe(line);
+                case "if" -> handle_new_if(split_line, line);
+                case "loop" -> handle_new_loop(split_line, line);
+                case "/" -> String.format("div %s", split_line[1]);
+                case "*" -> String.format("mul %s", split_line[1]);
+                case "segment" -> String.format("%s:", split_line[1]);
+                case "goto" -> "jmp " + split_line[1];
+                default -> switch(split_line[1]){
+                    case "=" -> String.format("mov %s, %s", split_line[0], split_line[2]);
+                    case "+" -> String.format("add %s, %s", split_line[0], split_line[2]);
+                    case "-" -> String.format("sub %s, %s", split_line[0], split_line[2]);
+                    default -> handle_unsafe(line);
+                };
             };
-        };
-        new_line += "\n";
         if(add_statement_end)
             new_line += handle_statement_end();
+        new_line += "\n";
         return new_line;
     }
 
