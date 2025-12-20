@@ -7,6 +7,7 @@ public class Main {
     static final String DEFAULT_OUTPUT_NAME = "out.asm";
     static final int MAX_NEXTED_STATEMENTS = 30;
 
+    static Dictionary<String, String[]> functions_dict = new Dictionary<>();
     static Stack<String> statement_stack = new Stack<>(MAX_NEXTED_STATEMENTS);
     static int if_count = 0;
     static int loop_count = 0;
@@ -33,8 +34,8 @@ public class Main {
         return line.trim();
     }
 
-    public static void handle_push_err(String push_str, int num, String line){
-        try{statement_stack.push(push_str + num);}catch(Exception e){
+    public static void handle_push_err(String push_str, String line){
+        try{statement_stack.push(push_str);}catch(Exception e){
             System.out.println("Error at line " + line_count + ":\n" + line+"\nExceeded Maximum Nested Statements");
             System.exit(-1);
         }
@@ -50,17 +51,25 @@ public class Main {
     }
 
     public static String handle_new_if(String[] array, String line){
-        handle_push_err("if_", if_count, line);
+        handle_push_err("if_" + if_count, line);
         String opposite = handle_opposite_err(array[2], line);
         if_count++;
         return String.format("cmp %s, %s\nj%s if_%d", array[1], array[3], opposite, if_count);
     }
 
     public static String handle_new_loop(String[] array, String line){
-        handle_push_err("loop_end_", loop_count, line);
+        handle_push_err("loop_end_" + loop_count, line);
         String opposite = handle_opposite_err(array[2], line);
         loop_count++;
         return String.format("loop_%d:\ncmp %s, %s\nj%s loop_end_%d", loop_count, array[1], array[3], opposite, loop_count);
+    }
+
+    public static String handle_function_def(String[] array, String line){
+        String name = array[1];
+        String[] args = Arrays.copyOfRange(array, 2, array.length);
+        functions_dict.add(name, args);
+        handle_push_err(String.format("ret\n%s_exit", name), line);
+        return String.format("jmp %s_exit\n%s:", name, name);
     }
 
     public static String handle_statement_end(){
@@ -74,7 +83,7 @@ public class Main {
     }
 
     public static String determine_line(String line){
-        String[] split_line = strip_whitespace(line.trim().split("[ (),]"));
+        String[] split_line = strip_whitespace(line.trim().split("[ (){},]"));
         char[] chars = line.trim().toCharArray();
         String new_line = "";
         boolean add_statement_end = false;
@@ -82,8 +91,6 @@ public class Main {
             return "\n";
         if(chars[0] == '#')
             new_line = "; "+split_line[1];
-        else if(chars[0] == '{')
-            return "";
         else if(line.contains("}"))
             add_statement_end = true;
         else new_line = switch (split_line[0]) {
@@ -93,6 +100,7 @@ public class Main {
                 case "*" -> String.format("mul %s", split_line[1]);
                 case "segment" -> String.format("%s:", split_line[1]);
                 case "goto" -> "jmp " + split_line[1];
+                case "fn" -> handle_function_def(split_line, line);
                 default -> switch(split_line[1]){
                     case "=" -> String.format("mov %s, %s", split_line[0], split_line[2]);
                     case "+" -> String.format("add %s, %s", split_line[0], split_line[2]);

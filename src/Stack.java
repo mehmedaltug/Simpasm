@@ -14,7 +14,7 @@ public class Stack<E> {
         return front == capacity;
     }
     public int size() {
-        return front + 1;
+        return front;
     }
     public E pop(){
         if(isEmpty()) return null;
