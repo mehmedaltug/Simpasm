@@ -5,7 +5,7 @@ I have noticed while writing my operating system that assembly is very easy to l
 
 <h3>Features</h3>
 <p>It makes abstractions that makes life easier.<br>
-For example, if statements become easier to keep track of and saves you the hussle:</p>
+You can write this simple if statement and someone can understand it easily:</p>
 
 ```
 if sp <= 10 {
@@ -13,7 +13,7 @@ if sp <= 10 {
 }
 ```
 
-Becomes:
+After which it translates to this:
 
 ```
 cmp sp, 10
@@ -21,53 +21,69 @@ jg if_X
 add ax, 5
 if_X:
 ```
-where X is determined by the compiler.<br>
+And you can define functions that are simpler to use:
 
-<h3>Syntax</h3>
-<p>REGISTER = VALUE<br>
-REGISTER + VALUE<br>
-REGISTER - VALUE<br>
-/ REGISTER<br>
-* REGISTER<br>
-# COMMENT<br>
-segment SEGMENT<br>
-goto SEGMENT<br>
-if REGISTER COMPARATOR VALUE {<br>
-  ...<br>
-}<br>
-loop REGISTER COMPARATOR VALUE {<br>
-  ...<br>
-}<br></p>
-<p>You can replace any of the VALUEs with registers.<br>
-In addition to these if the compiler comes across a line that does not match any of these it assumes it is a valid NASM line and includes those in the output but marks them as unsafe.<br></p>
+```
+fn add(ax, bx) {
+    ax + bx
+}
 
-<h3>Usage</h3>
-Intellij has a configured artifact to build the jar file using the Main.java and its requirements and then another build process has to be started to create an .exe (or standart executable for linux/mac) to build the program.<br>
-To use the program you must specify at least 1 argument which will be the name of the source file. Also there is an optional second argument which is the output file name.
+add(4, cx)
+```
+Which are a pain to use originally:
+
+```
+jmp add_exit
+add:
+add ax, bx
+ret
+add_exit:
+
+mov ax, 4
+mov bx, cx
+call add
+```
+
+<h3>Example Syntax</h3>
+```
+ax = 7
+bx + dx
+sp - 0x12
+/ dx
+* bx
+# Example comment here
+
+segment test
+cx + 4 
+if cx < 50 {
+    goto test
+}
+
+loop ax > 40 {
+    ax - 1
+}
+
+#Result will be in ax
+fn add_nums(ax, bx, cx){
+    ax + bx
+    ax + cx
+}
+add_nums(4, 20, 40)
+```
+<p>In addition to these if the compiler comes across a line that does not match any of the types predefined it assumes it is a valid NASM line and includes those in the output but marks them as unsafe.<br></p>
+
+<h3>Build</h3>
+Intellij has a configured artifact to build the jar file using the Main.java and its requirements and then another build process has to be started to create an .exe (or standart executable for linux/mac) to build the compiler.<br>
+To use the compiler you must specify at least 1 argument which will be the name of the source file. Also there is an optional second argument which is the output file name.
 
 <h3>Implementation</h3>
-For general operations, program uses splittage and keywords to determine the suitable replacement.<br>
-For if statements and loops it uses a custom Stack class that keeps track of the position we are in to determine which lines are in loops/ifs.
-
+For general operations, compiler uses splittage and keywords to determine the suitable replacement.<br>
+For if statements and loops it uses a custom Stack class that keeps track of the position we are in to determine which lines are in loops/ifs.<br>
+For function definitions and arguments, compiler uses a custom Dictionary class to save the function signatures and use the arguments accordingly.
 
 <h2>TODO:</h2>
-<h3>Add easier functions</h3>
-Syntax will be something similar to this:<br>
-
-```
-fn NAME(PARAMETERS) {
-  ...
-}
-NAME(VALUES)
-```
-And it will automaticly set required registers to values you specify, ex:
-
-```
-fn add(ax, bx){
-  ax + bx
-}
-add(5, 6) # result will be in ax
-```
+<h3>Add missing NASM functions</h3>
+Add push, pop, int and other essential operations.<br>
 
 <h3>Command-line flags</h3>
 Some useful flags like:<br>
