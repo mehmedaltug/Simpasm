@@ -51,16 +51,16 @@ public class Main {
     }
 
     public static String handle_new_if(String[] array, String line){
+        if_count++;
         handle_push_err("if_" + if_count, line);
         String opposite = handle_opposite_err(array[2], line);
-        if_count++;
         return String.format("cmp %s, %s\nj%s if_%d", array[1], array[3], opposite, if_count);
     }
 
     public static String handle_new_loop(String[] array, String line){
+        loop_count++;
         handle_push_err("loop_end_" + loop_count, line);
         String opposite = handle_opposite_err(array[2], line);
-        loop_count++;
         return String.format("loop_%d:\ncmp %s, %s\nj%s loop_end_%d", loop_count, array[1], array[3], opposite, loop_count);
     }
 
@@ -70,6 +70,24 @@ public class Main {
         functions_dict.add(name, args);
         handle_push_err(String.format("ret\n%s_exit", name), line);
         return String.format("jmp %s_exit\n%s:", name, name);
+    }
+
+    public static String call_function(String[] array, String line){
+        String name = array[0];
+        String[] line_args = Arrays.copyOfRange(array, 1, array.length);
+        String[] args = functions_dict.get(name);
+        if(args == null)
+            return handle_unsafe(line);
+        else if(args.length != line_args.length){
+            System.out.println("Tried to call non-existent function at " + line_count + ":\n" + line);
+            System.exit(-1);
+        }
+        String final_line = "";
+        for(int i = 0; i < line_args.length; i++){
+            final_line = String.format("%smov %s, %s\n", final_line, args[i], line_args[i]);
+        }
+        final_line += "call " + name;
+        return final_line;
     }
 
     public static String handle_statement_end(){
@@ -90,7 +108,7 @@ public class Main {
         if(line.trim().isEmpty())
             return "\n";
         if(chars[0] == '#')
-            new_line = "; "+split_line[1];
+            new_line = "; "+line;
         else if(line.contains("}"))
             add_statement_end = true;
         else new_line = switch (split_line[0]) {
@@ -105,7 +123,7 @@ public class Main {
                     case "=" -> String.format("mov %s, %s", split_line[0], split_line[2]);
                     case "+" -> String.format("add %s, %s", split_line[0], split_line[2]);
                     case "-" -> String.format("sub %s, %s", split_line[0], split_line[2]);
-                    default -> handle_unsafe(line);
+                    default -> call_function(split_line, line);
                 };
             };
         if(add_statement_end)
