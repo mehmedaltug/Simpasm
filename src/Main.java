@@ -28,6 +28,11 @@ public class Main {
         return Arrays.stream(str).filter(x -> !x.isEmpty()).toArray(String[]::new);
     }
 
+    public static String handle_unsafe(String line){
+        System.out.println("Unsafe Line at " + line_count + ":\n" + line+"\n");
+        return line.trim();
+    }
+
     public static void handle_push_err(String push_str, int num, String line){
         try{statement_stack.push(push_str + num);}catch(Exception e){
             System.out.println("Error at line " + line_count + ":\n" + line+"\nExceeded Maximum Nested Statements");
@@ -47,56 +52,57 @@ public class Main {
     public static String handle_new_if(String[] array, String line){
         handle_push_err("if_", if_count, line);
         String opposite = handle_opposite_err(array[2], line);
+        if_count++;
         return String.format("cmp %s, %s\nj%s if_%d", array[1], array[3], opposite, if_count);
     }
 
     public static String handle_new_loop(String[] array, String line){
         handle_push_err("loop_end_", loop_count, line);
         String opposite = handle_opposite_err(array[2], line);
+        loop_count++;
         return String.format("loop_%d:\ncmp %s, %s\nj%s loop_end_%d", loop_count, array[1], array[3], opposite, loop_count);
     }
 
-    public static String determine_line(String line){
-        String[] split_line = line.trim().split("[ (),]");
-        split_line = strip_whitespace(split_line);
+    public static String handle_statement_end(){
         String new_line;
-        if(line.trim().isEmpty()) return "\n";
-        if(line.trim().toCharArray()[0] == '#')
+        String statement = statement_stack.pop();
+        new_line = statement + ":";
+        String[] split = statement.split("_");
+        if(split[0].equals("loop"))
+            new_line = "jmp loop_" + split[2] + "\n" + new_line;
+        return new_line;
+    }
+
+    public static String determine_line(String line){
+        String[] split_line = strip_whitespace(line.trim().split("[ (),]"));
+        char[] chars = line.trim().toCharArray();
+        String new_line = "";
+        boolean add_statement_end = false;
+        if(line.trim().isEmpty())
+            return "\n";
+        if(chars[0] == '#')
             new_line = "; "+split_line[1];
-        else if(split_line[0].equals("if")) {
-            new_line = handle_new_if(split_line, line);
-            if_count++;
-        }
-        else if(split_line[0].equals("loop")) {
-            new_line = handle_new_loop(split_line, line);
-            loop_count++;
-        }
-        else if(split_line[0].equals("}")){
-            String statement = statement_stack.pop();
-            new_line = statement + ":";
-            String[] split = statement.split("_");
-            if(split[0].equals("loop"))
-                new_line = "jmp loop_" + split[2] + "\n" + new_line;
-        }
-        else if(split_line[0].equals("goto"))
-            new_line = "jmp " + split_line[1];
-        else if(split_line[1].equals("="))
-            new_line = String.format("mov %s, %s", split_line[0], split_line[2]);
-        else if(split_line[0].equals("segment"))
-            new_line = String.format("%s:", split_line[1]);
-        else if(split_line[1].equals("+"))
-            new_line = String.format("add %s, %s", split_line[0], split_line[2]);
-        else if(split_line[1].equals("-"))
-            new_line = String.format("sub %s, %s", split_line[0], split_line[2]);
-        else if(split_line[0].equals("*"))
-            new_line = String.format("mul %s", split_line[1]);
-        else if(split_line[0].equals("/"))
-            new_line = String.format("div %s", split_line[1]);
-        else{
-            new_line = line.trim();
-            System.out.println("Unsafe Line at " + line_count + ":\n" + line+"\n");
-        }
+        else if(chars[0] == '{')
+            return "";
+        else if(line.contains("}"))
+            add_statement_end = true;
+        else new_line = switch (split_line[0]) {
+            case "if" -> handle_new_if(split_line, line);
+            case "loop" -> handle_new_loop(split_line, line);
+            case "/" -> String.format("div %s", split_line[1]);
+            case "*" -> String.format("mul %s", split_line[1]);
+            case "statement" -> String.format("%s:", split_line[1]);
+            case "goto" -> "jmp " + split_line[1];
+            default -> switch(split_line[1]){
+                case "=" -> String.format("mov %s, %s", split_line[0], split_line[2]);
+                case "+" -> String.format("add %s, %s", split_line[0], split_line[2]);
+                case "-" -> String.format("sub %s, %s", split_line[0], split_line[2]);
+                default -> handle_unsafe(line);
+            };
+        };
         new_line += "\n";
+        if(add_statement_end)
+            new_line += handle_statement_end();
         return new_line;
     }
 
