@@ -7,6 +7,9 @@ public class Main {
     static final String DEFAULT_OUTPUT_NAME = "out.asm";
     static final int MAX_NEXTED_STATEMENTS = 30;
 
+    static boolean DISABLE_WARNINGS = false;
+    static boolean DISABLE_UNSAFE = false;
+
     static Dictionary<String, String[]> functions_dict = new Dictionary<>();
     static Stack<String> statement_stack = new Stack<>(MAX_NEXTED_STATEMENTS);
     static int if_count = 0;
@@ -30,14 +33,19 @@ public class Main {
     }
 
     public static String handle_unsafe(String line){
-        System.out.println("Unsafe Line at " + line_count + ":\n" + line+"\n");
+        if(DISABLE_UNSAFE){
+            System.out.printf("Unsafe lines are not allowed.\nUnsafe line detected at %d:\n%s\n", line_count, line);
+            System.exit(1);
+        }
+        if(!DISABLE_WARNINGS)
+            System.out.println("Unsafe Line at " + line_count + ":\n" + line+"\n");
         return line.trim();
     }
 
     public static void handle_push_err(String push_str, String line){
         try{statement_stack.push(push_str);}catch(Exception e){
             System.out.printf("Error at line %d:\n%s\nExceeded Maximum Nested Statements\n", line_count, line);
-            System.exit(-1);
+            System.exit(1);
         }
     }
 
@@ -45,7 +53,7 @@ public class Main {
         String opposite = null;
         try{opposite = negative_comparator(original);}catch(Exception e){
             System.out.printf("Error at line %d:\n%s\nInvalid Comparator\n", line_count, line);
-            System.exit(-1);
+            System.exit(1);
         }
         return opposite;
     }
@@ -72,13 +80,13 @@ public class Main {
         return String.format("jmp %s_exit\n%s:", name, name);
     }
 
-    public static String handle_pushpop(String[] array, String line){
+    public static String handle_push_pop(String[] array, String line){
         StringBuilder new_line = new StringBuilder();
         String operation = array[0];
         for (int i = 1; i < array.length; i++){
             if(!array[i].matches(".*[a-z]x") && !array[i].equals("all")){
                 System.out.printf("Encountered an invalid register at %d:\n %s%n\n", line_count, line);
-                System.exit(-1);
+                System.exit(1);
             }
             if(array[i].equals("all")){
                 new_line.append(operation).append("a\n");
@@ -97,7 +105,7 @@ public class Main {
             return handle_unsafe(line);
         else if(args.length != line_args.length){
             System.out.println("Tried to call non-existent function at " + line_count + ":\n" + line);
-            System.exit(-1);
+            System.exit(1);
         }
         String final_line = "";
         for(int i = 0; i < line_args.length; i++){
@@ -136,7 +144,7 @@ public class Main {
                 case "segment" -> String.format("%s:", split_line[1]);
                 case "goto" -> "jmp " + split_line[1];
                 case "fn" -> handle_function_def(split_line, line);
-                case "push", "pop" -> handle_pushpop(split_line, line);
+                case "push", "pop" -> handle_push_pop(split_line, line);
                 default -> switch(split_line[1]){
                     case "=" -> String.format("mov %s, %s", split_line[0], split_line[2]);
                     case "+" -> String.format("add %s, %s", split_line[0], split_line[2]);
@@ -151,17 +159,31 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        StringBuilder file_contents = new StringBuilder();
         if(args.length < 1){
             System.out.println("Need at least 1 argument.");
-            System.exit(-1);
+            System.exit(1);
         }
+        String[] arguments = Arrays.stream(args).filter(x -> !x.matches("^-.*")).toArray(String[]::new);
+        String[] parameters = Arrays.stream(args).filter(x -> !x.matches("^[a-zA-Z0-9.]+$")).toArray(String[]::new);
+        StringBuilder file_contents = new StringBuilder();
+
+        for (String parameter : parameters) {
+            if(parameter.equals("--disable-warnings") || parameter.equals("-dw")) DISABLE_WARNINGS = true;
+            else if(parameter.equals("--disable-unsafe") || parameter.equals("-du")) DISABLE_UNSAFE = true;
+            else{
+                System.out.println("Unknown parameter: " + parameter);
+                System.exit(1);
+            }
+        }
+
         String output_name = DEFAULT_OUTPUT_NAME;
-        if(args.length > 1) output_name = args[1];
-        File input_file = new File(args[0]);
+        if(arguments.length > 1) output_name = arguments[1];
+        File input_file = new File(arguments[0]);
         File output_file = new File(output_name);
+
         if(input_file.exists()) output_file.delete();
         output_file.createNewFile();
+
         try(Scanner input = new Scanner(input_file)){
             while(input.hasNextLine()){
                 String line = input.nextLine();
@@ -169,6 +191,7 @@ public class Main {
                 file_contents.append(determine_line(line));
             }
         }
+
         FileWriter file_writer = new FileWriter(output_file);
         file_writer.write(file_contents.toString());
         file_writer.close();
