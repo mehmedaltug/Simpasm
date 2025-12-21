@@ -160,7 +160,10 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         if(args.length < 1){
-            System.out.println("Need at least 1 argument.");
+            System.out.println("Need at least 1 argument.\n");
+            System.out.println("Example usage:\nsimpasm input_file -dw output_file\nsimpasm -du input\nsimpasm input\n");
+            System.out.println("Flags:\n--disable-unsafe\tDisables the usage of unsafe lines.\n-du");
+            System.out.println("\n--disable-warnings\tDisables the warnings of unsafe lines.\n-dw");
             System.exit(1);
         }
         String[] arguments = Arrays.stream(args).filter(x -> !x.matches("^-.*")).toArray(String[]::new);
