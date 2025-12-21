@@ -36,7 +36,7 @@ public class Main {
 
     public static void handle_push_err(String push_str, String line){
         try{statement_stack.push(push_str);}catch(Exception e){
-            System.out.println("Error at line " + line_count + ":\n" + line+"\nExceeded Maximum Nested Statements");
+            System.out.printf("Error at line %d:\n%s\nExceeded Maximum Nested Statements\n", line_count, line);
             System.exit(-1);
         }
     }
@@ -44,7 +44,7 @@ public class Main {
     public static String handle_opposite_err(String original, String line){
         String opposite = null;
         try{opposite = negative_comparator(original);}catch(Exception e){
-            System.out.println("Error at line " + line_count + ":\n" + line+"\nInvalid Comparator");
+            System.out.printf("Error at line %d:\n%s\nInvalid Comparator\n", line_count, line);
             System.exit(-1);
         }
         return opposite;
@@ -70,6 +70,23 @@ public class Main {
         functions_dict.add(name, args);
         handle_push_err(String.format("ret\n%s_exit", name), line);
         return String.format("jmp %s_exit\n%s:", name, name);
+    }
+
+    public static String handle_pushpop(String[] array, String line){
+        StringBuilder new_line = new StringBuilder();
+        String operation = array[0];
+        for (int i = 1; i < array.length; i++){
+            if(!array[i].matches(".*[a-z]x") && !array[i].equals("all")){
+                System.out.printf("Encountered an invalid register at %d:\n %s%n\n", line_count, line);
+                System.exit(-1);
+            }
+            if(array[i].equals("all")){
+                new_line.append(operation).append("a\n");
+                continue;
+            }
+            new_line.append(String.format("%s %s\n", operation, array[i]));
+        }
+        return new_line.toString().replaceAll("\n$", "");
     }
 
     public static String call_function(String[] array, String line){
@@ -106,7 +123,7 @@ public class Main {
         String new_line = "";
         boolean add_statement_end = false;
         if(line.trim().isEmpty())
-            return "\n";
+            return "";
         if(chars[0] == '#')
             new_line = "; "+line;
         else if(line.contains("}"))
@@ -119,6 +136,7 @@ public class Main {
                 case "segment" -> String.format("%s:", split_line[1]);
                 case "goto" -> "jmp " + split_line[1];
                 case "fn" -> handle_function_def(split_line, line);
+                case "push", "pop" -> handle_pushpop(split_line, line);
                 default -> switch(split_line[1]){
                     case "=" -> String.format("mov %s, %s", split_line[0], split_line[2]);
                     case "+" -> String.format("add %s, %s", split_line[0], split_line[2]);
