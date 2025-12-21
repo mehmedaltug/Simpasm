@@ -65,12 +65,17 @@ loop ax > 40 {
 
 #Result will be in ax
 fn add_nums(ax, bx, cx){
+    push all
+    push bx, cx
+    bx + cx
     ax + bx
-    ax + cx
+    pop bx, cx, all
 }
 add_nums(4, 20, 40)
 ```
-<p>In addition to these if the compiler comes across a line that does not match any of the types predefined it assumes it is a valid NASM line and includes those in the output but marks them as unsafe.<br></p>
+<p>In addition to these if the compiler comes across a line that does not match any of the types predefined it assumes it is a valid NASM line and includes those in the output but marks them as unsafe and gives a warning.<br></p>
+<p>You can disable unsafe lines with "--disable-unsafe" or "-du" flags
+<br>And you can disable warnings with "disable-warnings" or "-dw" flags.</p>
 
 <h3>Build</h3>
 Intellij has a configured artifact to build the jar file using the Main.java and its requirements and then another build process has to be started to create an .exe (or standart executable for linux/mac) to build the compiler.<br>
@@ -83,14 +88,4 @@ For function definitions and arguments, compiler uses a custom Dictionary class 
 
 <h2>TODO:</h2>
 <h3>Add missing NASM functions</h3>
-Add push, pop, int and other essential operations.<br>
-
-<h3>Command-line flags</h3>
-Some useful flags like:<br>
-<p>--disable-unsafe<br>
--du<br>
-will raise an error if unsafe lines are encountered (which requires me to add more functionality)</p>
-
-<p>--disable-warnings<br>
--dw <br>
-will disable unsafe warnings</p>
+Add other essential operations.<br>
