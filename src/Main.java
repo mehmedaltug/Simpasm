@@ -6,6 +6,9 @@ import java.util.Scanner;
 public class Main {
     static final String DEFAULT_OUTPUT_NAME = "out.asm";
     static final int MAX_NEXTED_STATEMENTS = 30;
+    static final String AS_IS_KEYWORDS = "inc,dec,db,dw,dd,dq,section,align,alignb,struc,endstruc,istruc,at,iend,dt,ddq,do,resb," +
+            "resw,resd,resq,rest,resdq,reso,times,equ,global,extern,common,cpu,bits,org,%define,%macro,%endmacro,%ifdef,%ifndef" +
+            "%else,%endif,%include,%assign,%strlen,%substr,byte,word,dword,ptr,strict,short,near,far,nosplit,rel,abs,seg,wrt$$";
 
     static boolean DISABLE_WARNINGS = false;
     static boolean DISABLE_UNSAFE = false;
@@ -84,7 +87,7 @@ public class Main {
         StringBuilder new_line = new StringBuilder();
         String operation = array[0];
         for (int i = 1; i < array.length; i++){
-            if(!array[i].matches(".*[a-z]x") && !array[i].equals("all")){
+            if(!array[i].matches(".*[a-z][ipx]") && !array[i].equals("all")){
                 System.out.printf("Encountered an invalid register at %d:\n %s%n\n", line_count, line);
                 System.exit(1);
             }
@@ -145,6 +148,7 @@ public class Main {
                 case "goto" -> "jmp " + split_line[1];
                 case "fn" -> handle_function_def(split_line, line);
                 case "push", "pop" -> handle_push_pop(split_line, line);
+                case String x when AS_IS_KEYWORDS.contains(x.replaceAll("[\\[\\]]","")) -> line;
                 default -> switch(split_line[1]){
                     case "=" -> String.format("mov %s, %s", split_line[0], split_line[2]);
                     case "+" -> String.format("add %s, %s", split_line[0], split_line[2]);
