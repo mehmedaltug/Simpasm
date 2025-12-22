@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
 Main-Class: Main
+Specification-Version: 25.12.22
+Implementation-Version: 25.12.22
 

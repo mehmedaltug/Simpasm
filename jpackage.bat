@@ -1,1 +1,0 @@
-jpackage --name Simpasm --main-jar Simpasm-java.jar --input . --main-class Main
