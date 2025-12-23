@@ -15,8 +15,10 @@ public class Main {
 
     static Dictionary<String, String[]> functions_dict = new Dictionary<>();
     static Stack<String> statement_stack = new Stack<>(MAX_NEXTED_STATEMENTS);
+    static boolean inside_loop = false;
     static int if_count = 0;
     static int loop_count = 0;
+    static int active_loops = 0;
     static int line_count = 0;
 
     public static String negative_comparator(String comparator) throws Exception{
@@ -70,7 +72,10 @@ public class Main {
 
     public static String handle_new_loop(String[] array, String line){
         loop_count++;
+        active_loops += 1;
+        inside_loop = true;
         handle_push_err("loop_end_" + loop_count, line);
+        if(array.length == 1) return String.format("loop_%d:", loop_count);
         String opposite = handle_opposite_err(array[2], line);
         return String.format("loop_%d:\ncmp %s, %s\nj%s loop_end_%d", loop_count, array[1], array[3], opposite, loop_count);
     }
@@ -123,16 +128,24 @@ public class Main {
         String statement = statement_stack.pop();
         new_line = statement + ":";
         String[] split = statement.split("_");
-        if(split[0].equals("loop"))
+        if(split[0].equals("loop")) {
+            active_loops--;
+            inside_loop = active_loops > 0;
             new_line = "jmp loop_" + split[2] + "\n" + new_line;
+        }
         return new_line;
     }
 
     public static String handle_continue_break(String mode, String line){
         String stack_top = statement_stack.top();
-        if(!stack_top.contains("loop")){
+        if(stack_top == null || !inside_loop){
             System.out.println("Encountered an invalid "+ mode +" at " + line_count + ":\n" + line);
             System.exit(1);
+        }
+        int offset = 1;
+        while(!stack_top.contains("loop")){
+            stack_top = statement_stack.getFrom(offset);
+            offset++;
         }
         String[] top_parts = stack_top.split("_");
         if(mode.equals("continue")) return String.format("jmp loop_%s:", top_parts[2]);
