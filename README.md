@@ -64,6 +64,13 @@ loop ax > 40 {
     ax - 1
 }
 
+loop {
+    bx - 9
+    if bx < 10 {
+        break
+    }
+}
+
 #Result will be in ax
 fn add_nums(ax, bx, cx){
     push all
