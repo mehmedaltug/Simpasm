@@ -23,6 +23,10 @@ public class Stack<E> {
         array[front] = null;
         return temp;
     }
+    public E top(){
+        if(isEmpty()) return null;
+        return (E) array[front-1];
+    }
     public void push(E e) throws Exception{
         if(isFull()) throw new Exception("Stack is full");
         array[front] = e;
