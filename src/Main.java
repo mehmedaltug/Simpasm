@@ -128,6 +128,17 @@ public class Main {
         return new_line;
     }
 
+    public static String handle_continue_break(String mode, String line){
+        String stack_top = statement_stack.top();
+        if(!stack_top.contains("loop")){
+            System.out.println("Encountered an invalid "+ mode +" at " + line_count + ":\n" + line);
+            System.exit(1);
+        }
+        String[] top_parts = stack_top.split("_");
+        if(mode.equals("continue")) return String.format("jmp loop_%s:", top_parts[2]);
+        return String.format("jmp loop_end_%s:", top_parts[2]);
+    }
+
     public static String determine_line(String line){
         String[] split_line = strip_whitespace(line.trim().split("[ (){},]"));
         char[] chars = line.trim().toCharArray();
@@ -149,12 +160,13 @@ public class Main {
                 case "fn" -> handle_function_def(split_line, line);
                 case "push", "pop" -> handle_push_pop(split_line, line);
                 case String x when AS_IS_KEYWORDS.contains(x.replaceAll("[\\[\\]]","")) -> line;
-                default -> switch(split_line[1]){
+                case "break", "continue" -> handle_continue_break(split_line[0], line);
+                default -> split_line.length > 1 ? switch(split_line[1]){
                     case "=" -> String.format("mov %s, %s", split_line[0], split_line[2]);
                     case "+" -> String.format("add %s, %s", split_line[0], split_line[2]);
                     case "-" -> String.format("sub %s, %s", split_line[0], split_line[2]);
                     default -> call_function(split_line, line);
-                };
+                } : call_function(split_line, line);
             };
         if(add_statement_end)
             new_line += handle_statement_end();
