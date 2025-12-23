@@ -45,6 +45,7 @@ call add
 ```
 
 <h3>Example Syntax</h3>
+
 ```
 ax = 7
 bx + dx
