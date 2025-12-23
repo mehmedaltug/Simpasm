@@ -81,6 +81,8 @@ add_nums(4, 20, 40)
 <h3>Build</h3>
 Intellij has a configured artifact to build the jar file using the Main.java and its requirements or if you prefer you can build the jar file yourself using the manifest.mf file. After building the jar file you can use windows or unix build scripts I provided in the root directory to create standalone executables if you prefer.<br>
 
+It is required to add the program to the PATH after installing. UNIX binaries will be in the ```/opt/simpasm/bin``` folder and Windows binaries will be in the ```C:\Program Files\simpasm``` .
+
 <h3>Implementation</h3>
 For general operations, compiler uses splitting and keywords to determine the suitable replacement.<br>
 For if statements and loops it uses a custom Stack class that keeps track of the position we are in to determine which lines are in loops/ifs.<br>
