@@ -21,6 +21,7 @@ jg if_X
 add ax, 5
 if_X:
 ```
+
 And you can define functions that are simpler to use:
 
 ```
@@ -30,6 +31,7 @@ fn add(ax, bx) {
 
 add(4, cx)
 ```
+
 Which are a pain to use originally:
 
 ```
@@ -55,7 +57,7 @@ sp - 0x12
 # Example comment here
 
 segment test
-cx + 4 
+cx + 4
 if cx < 50 {
     goto test
 }
@@ -81,14 +83,15 @@ fn add_nums(ax, bx, cx){
 }
 add_nums(4, 20, 40)
 ```
+
 <p>In addition to these if the compiler comes across a line that does not match any of the types predefined it assumes it is a valid NASM line and includes those in the output but marks them as unsafe and gives a warning.<br></p>
 <p>You can disable unsafe lines with "--disable-unsafe" or "-du" flags
 <br>And you can disable warnings with "disable-warnings" or "-dw" flags.</p>
 
 <h3>Build</h3>
-Intellij has a configured artifact to build the jar file using the Main.java and its requirements or if you prefer you can build the jar file yourself using the manifest.mf file. After building the jar file you can use windows or unix build scripts I provided in the root directory to create standalone executables if you prefer.<br>
+First, you must build the jar file using the Main.java and its requirements. After building the jar file you can use windows or unix build scripts I provided in the root directory to create standalone executables if you prefer.<br>
 
-It is required to add the program to the PATH after installing. UNIX binaries will be in the ```/opt/simpasm/bin``` folder and Windows binaries will be in the ```C:\Program Files\simpasm``` .
+It is required to add the program to the PATH after installing. UNIX binaries will be in the `/opt/simpasm/bin` folder and Windows binaries will be in the `C:\Program Files\simpasm` .
 
 <h3>Implementation</h3>
 For general operations, compiler uses splitting and keywords to determine the suitable replacement.<br>

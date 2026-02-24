@@ -27,6 +27,10 @@ public class Stack<E> {
         if(isEmpty()) return null;
         return (E) array[front-1];
     }
+    public E getFrom(int i){
+        if(isEmpty()) return null;
+        return (E) array[front-1-i];
+    }
     public void push(E e) throws Exception{
         if(isFull()) throw new Exception("Stack is full");
         array[front] = e;
